@@ -15,7 +15,5 @@ dgm(G,[D, FT]) = 1;
 CPDs{B} = tabularCpdCreate([0.1 ; 0.9]);
 CPDs{F} = tabularCpdCreate([0.1 ; 0.9]);
 CPDs{G} = tabularCpdCreate(reshape([0.9 0.8 0.8 0.2 0.1 0.2 0.2 0.8], 2, 2, 2));
-CPDs{D} = tabularCpdCreate(reshape([0.95 0.7 0.05 0.3], 2, 2));
-CPDs{FT} = tabularCpdCreate(reshape([0.2 0.6 0.8 0.4], 2, 2));
 
-dgm = dgmCreate(dgm, CPDs, 'nodenames', names, 'infEngine', 'jtree');
+CPDs{D} = TabularCpdCreate(reshape(
