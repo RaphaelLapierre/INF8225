@@ -1,0 +1,211 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Thin Sectioned Essay
+% LaTeX Template
+% Version 1.0 (3/8/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original Author:
+% Nicolas Diaz (nsdiaz@uc.cl) with extensive modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[a4paper, 12pt]{article} % Font size (can be 10pt, 11pt or 12pt) and paper size (remove a4paper for US letter paper)
+
+\usepackage[protrusion=true,expansion=true]{microtype} % Better typography
+\usepackage{graphicx} % Required for including pictures
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{url}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{setspace}
+\usepackage{enumitem}
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\usepackage[T1]{fontenc} % Required for accented characters
+\usepackage{times} % Use the Palatino font
+
+\usepackage{listings}
+\usepackage{color}
+\lstset{mathescape}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+   language=c++,
+   aboveskip=3mm,
+   belowskip=3mm,
+   showstringspaces=false,
+   columns=flexible,
+   basicstyle={\small\ttfamily},
+   numbers=none,
+   numberstyle=\tiny\color{gray},
+   keywordstyle=\color{blue},
+   commentstyle=\color{dkgreen},
+   stringstyle=\color{mauve},
+   breaklines=true,
+   breakatwhitespace=true
+   tabsize=3
+}
+\linespread{1.00} % Change line spacing here, Palatino benefits from a slight increase by default
+
+\makeatletter
+\renewcommand{\@listI}{\itemsep=0pt} % Reduce the space between items in the itemize and enumerate environments and the bibliography
+
+\renewcommand\abstractname{Résumé}
+\renewcommand\refname{Références}
+\renewcommand\contentsname{Table des matières}
+\renewcommand{\maketitle}{ % Customize the title - do not edit title and author name here, see the TITLE block below
+\begin{center} % Right align
+
+\vspace*{25pt} % Some vertical space between the title and author name
+{\LARGE\@title} % Increase the font size of the title
+
+\vspace{125pt} % Some vertical space between the title and author name
+
+{\large\@author} % Author name
+
+\vspace{125pt} % Some vertical space between the author block and abstract
+Dans le cadre du cours
+\\INF8225 - Intelligence artificielle : Techniques probabilistes et d'apprentissage
+\vspace{125pt} % Some vertical space between the author block and abstract
+\\\@date % Date
+\vspace{125pt} % Some vertical space between the author block and abstract
+
+\end{center}
+}
+
+%----------------------------------------------------------------------------------------
+%	TITLE
+%----------------------------------------------------------------------------------------
+
+\title{TP1 : Laboratoire 1} 
+
+\author{\textsc{Raphael Lapierre 1644671} % Author
+\vspace{10pt}
+\\{\textit{École polytechnique de Montréal}}} % Institution
+
+\date{02 Février 2016} % Date
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\thispagestyle{empty}
+\clearpage\maketitle % Print the title section
+\pagebreak[4]
+%----------------------------------------------------------------------------------------
+%	En tête et pieds de page 
+%----------------------------------------------------------------------------------------
+
+\setlength{\headheight}{15.0pt}
+\pagestyle{fancy}
+\fancyhead[L]{INF8225}
+\fancyhead[C]{}
+\fancyhead[R]{TP1 - Laboratoire 1}
+\fancyfoot[C]{\textbf{page \thepage}}
+
+%----------------------------------------------------------------------------------------
+%	ESSAY BODY
+%----------------------------------------------------------------------------------------
+\section*{Question 1}
+Le code démontrant les exemples pratiques des trois phénomènes différents sont 
+fournis avec l'archive. Le fichier à éxécuter est \textit{Question1.m}.
+Des commentaires sont écrit à la console lors de l'éxécution pour plus d'informations.
+
+\subsection*{Explaining Away}
+L'explaining away est un phénomène qui se produit lorsque deux noeuds partagent des enfants.
+Lorsqu'un des enfants qui partagé est observé, la modification d'observation sur un des parents
+aura une influence sur l'autre. En effet, dans l'exemple de la question 1 montré en code, 
+B n'a aucune influence sur F jusqu'à ce que leur enfant G soit observé. Dans ce cas, si on observe
+B aussi, F voit sa probabilité modifiée. Les raisons expliquant B sont prise par G. On dit que 
+G explain away F.
+
+\subsection*{Serial Blocking}
+Le serial blocking se produit dans une chaine de noeuds. Lorsqu'un des noeuds de la chaine
+est observé, l'influence arrête de se transmettre au dela de ce noeuds des deux côtés de la
+chaine. Toujours dans l'exemple de la question 1, on peut comprendre que la probabilité de 
+D ne dépend plus de B si G et fixé.
+
+\subsection*{Divergent Blocking}
+Le divergent blocking se produit lorsque deux enfants possèdent un parent. Les enfants
+on de l'influence entre eux parce que si on augmente les probabilité d'un enfant,
+les probabilités de son parent augmente ce qui cause aussi une augmentation sur l'autre enfant
+du même coup. Si on fixe le parent, les probabilités de l'enfant ne peuvent plus modifier celle
+du parent et donc celle de l'autre enfant. Ils sont donc bloqués. Dans notre exemple, 
+on fixe G pour montrer que D n'a plus d'influence sur F.
+
+\section*{Question 2}
+\subsection*{2.b)}
+L'histogramme est montré lorsque le fichier matlab est executé. Il est difficile de formatter
+le nom des axes pour montrer les situations qui mènent au résultat. Le résultat le plus à gauche
+de l'histogramme est $[0,0,0,0,0]$ et celui à droite est $[1,1,1,1,1]$.
+
+\subsection*{2.e)}
+Voici l'équation pour calculer $P(J)$.
+\begin{equation}
+    P(J) = \sum\limits_{CTAM} P(C,T,A,J = V, M)
+\end{equation}
+\begin{equation}
+    P(J) = \sum\limits_{CTAM} \prod\limits_{i = 1}^{n}P(V_{i}|parents(V_{i}))
+\end{equation}
+\begin{equation}
+    P(J) = \sum\limits_{CTAM} P(C)P(T)P(A|C,T)P(M|A)P(J|A,T)
+\end{equation}
+On trouve donc 16 termes pour toutes les combinaisons de $CTAM$ qui une fois additionnés,
+donne $P(J)$. Pour ce qui est de $P(C | J = V)$ on peut utiliser les équations suivantes.
+
+\begin{equation}
+    P(C|J = V) = \frac{P(C,J)}{P(J)}
+\end{equation}
+\begin{equation}
+    P(C|J = V) = \frac{\sum\limits_{TAM} P(C = V,T,A,J = V, M)}{P(J)}
+\end{equation}
+\begin{equation}
+    P(C|J = V) = \frac{\sum\limits_{TAM} \prod\limits_{i = 1}^{n}P(V_{i}|parents(V_{i}))}{P(J)}
+\end{equation}
+\begin{equation}
+    P(C|J = V) = \frac{\sum\limits_{TAM} P(C)P(T)P(A|C,T)P(M|A)P(J|A,T)}{P(J)}
+\end{equation}
+
+\section*{Question 3}
+La première étape pour effectuer l'algorithme EM dans l'exemple donné à la question 3 
+est d'établir des probabilités au hazard. Une fois cette étape faite on peut commencer 
+à appliquer les équations suivantes. On trouve les probabilités conjointes :
+
+\begin{equation}
+P(A|M,J) = \frac{\sum\limits_{MT} P(A,M,T)}{P(M,T)}
+\end{equation}
+\begin{equation}
+P(M,J) = \sum\limits_{A} P(A)P(M|A)P(J|A)
+\end{equation}
+
+À l'aide des termes $P(M,J)$ ainsi que du nombre d'échantillion $N$ et $n_{i}$ pour le nième
+exemple, on peut estimer le Log vraisemblance avec l'équation suivante :
+
+\begin{equation}
+Log Vraisemblance = \sum\limits_{i = 1}^{2^{2}} n_{i}\log(P)
+\end{equation}
+
+Dans cette équation il n'y a que quatres termes car les exemple ne dépendent que de M et J 
+donc $2 * 2 = 4$.
+Maintenant, à l'aide des probabilités $P(A|M,J)$, on peut trouver un nouveau $n_{i}$
+en effectuant la multiplication : $n_{i} = n_{i} * P(M|A,J)$. Finalement, avec les nouveaux
+$n_{i}$ on peut trouver les nouveaux paramètres pour le réseaux bayésien. Les itérations
+continues jusqu'à convergence du Log vraimsemblance ou bien jusqu'à un nombre d'itération
+maximal.
+
+%----------------------------------------------------------------------------------------
+\end{document}

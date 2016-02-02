@@ -1,0 +1,32 @@
+\begin{thebibliography}{1}
+
+\bibitem{SmartPointer:Boost}
+Boost.
+\newblock Smart pointers - 1.55.0.
+\newblock \url{www.boost.org/doc/libs/1_55_0/libs/smart_ptr/smart_prt.htm},
+  2013.
+\newblock [En ligne; visité le 17 novembre 2013].
+
+\bibitem{GarbageCollector:Oracle}
+Oracle.
+\newblock Java garbage collection basics.
+\newblock
+  \url{www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html},
+  2013.
+\newblock [En ligne; visité le 15 novembre 2013].
+
+\bibitem{MemoryLeak:StackOverflow}
+StackOverflow.
+\newblock The best memory leak definition.
+\newblock
+  \url{stackoverflow.com/questions/312069/the-best-memory-leak-definition},
+  2013.
+\newblock [En ligne; visité le 16 novembre 2013].
+
+\bibitem{MemoryLeak:Wikipedia}
+Wikipedia.
+\newblock Memory leak - wikipedia, the free encyclopedia.
+\newblock \url{en.wikipedia.org/wiki/Memory_leak}, 2013.
+\newblock [En ligne; visité le 16 novembre 2013].
+
+\end{thebibliography}
