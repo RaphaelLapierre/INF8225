@@ -1,8 +1,10 @@
 ﻿import random
+import matplotlib.pyplot as plt
 import numpy as np
 import csv
 
 def main():
+
     # Read inputs
     with open('./documents.txt', 'rt') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
@@ -62,6 +64,7 @@ def main():
     learning_rate = 0.0005
 
     # Approche par batch
+    print("Batch")
     batch_precisionA_output = []
     batch_precisionV_output = []
     batch_log_vraisemblance_output = []
@@ -85,10 +88,24 @@ def main():
         batch_precisionA_output.append(precision(XA, YA, Theta, n))
         batch_precisionV_output.append(precision(XV, YV, Theta, n))
 
-        if len(batch_log_vraisemblance_output) != 1:
-            converged = (batch_log_vraisemblance_output[-1] - batch_log_vraisemblance_output[-2]) < 1.0
+        if len(batch_log_vraisemblance_output) > 1:
+            converged = (batch_log_vraisemblance_output[-1] - batch_log_vraisemblance_output[-2]) < 0.5
 
+    plt.plot(batch_log_vraisemblance_output)
+    plt.title("Log vraisemblance de la méthode sans batch")
+    plt.ylabel("Log vraisemblance")
+    plt.xlabel("Iteration")
+    plt.show()
+
+    plt.plot(batch_precisionV_output, label="Validation")
+    plt.plot(batch_precisionA_output, label="Apprentissage")
+    plt.title("Graphique de la précision sur les ensembles d'apprentissage et de validation")
+    plt.ylabel("Précision")
+    plt.xlabel("Itération")
+    plt.legend(loc="lower right")
+    plt.show()
     # Approche par minibatch
+    print("Mini Batch")
 
     Theta = []
     for i in range(4):
@@ -97,7 +114,7 @@ def main():
     NumberOfBatches = 20
     Alpha = 0.5
     DeltaTheta = np.zeros((4, 101))
-    converged = False
+    converged = True
     iteration = -1
     learning_rate = 0.0005
 
@@ -125,6 +142,98 @@ def main():
             Gradient = (Gauche - Droite) / NumberOfBatches
             DeltaTheta = Alpha * DeltaTheta + learning_rate * Gradient
             Theta = Theta + DeltaTheta
+
+            minibatch_precisionA_output.append(precision(XA, YA, Theta, n))
+            minibatch_precisionV_output.append(precision(XV, YV, Theta, n))
+
+            if len(minibatch_log_vraisemblance_output) > 1:
+                converged = (minibatch_log_vraisemblance_output[-1] - minibatch_log_vraisemblance_output[-2]) < 0.5
+
+    plt.plot(minibatch_log_vraisemblance_output)
+    plt.title("Log vraisemblance de la méthode de mini-batch sans régularisation")
+    plt.ylabel("Log vraisemblance")
+    plt.xlabel("Iteration")
+    plt.show()
+
+    plt.plot(minibatch_precisionA_output, label="Validation")
+    plt.plot(minibatch_precisionV_output, label="Apprentissage")
+    plt.title("Graphique de la précision sur les ensembles d'apprentissage et de validation")
+    plt.ylabel("Précision")
+    plt.xlabel("Itération")
+    plt.legend(loc="lower right")
+    plt.show()
+    # Mini batch avec régularisation
+    print("Mini batch with reg")
+
+    # Adding random values to X
+    regularizationValues = np.random.randint(2, size=(X.shape[0], 100))
+    X = np.append(X, regularizationValues, axis=1)
+    XA, XV, XT = np.vsplit(X, percent)
+
+    Theta = []
+    for i in range(4):
+        Theta.append([random.random() - 0.5 for i in range(201)])
+    Theta = np.array(Theta)
+    NumberOfBatches = 20
+    Alpha = 0.5
+    DeltaTheta = np.zeros((4, 201))
+    converged = False
+    iteration = -1
+    learning_rate = 0.0005
+
+    lambda1 = 0.01
+    lambda2 = 0.05
+
+    regularization_minibatch_precisionA_output = []
+    regularization_minibatch_precisionV_output = []
+    regularization_minibatch_log_vraisemblance_output = []
+
+
+    while not converged:
+        iteration = iteration + 1
+        listXB, listYB = create_mini_batch(XA, YA, 20)
+
+        for XB, YB in zip(listXB, listYB):
+            learningSize = XA.shape[0]
+            batchSize = XB.shape[0]
+            Y_possibility = np.identity(n)
+            Z = np.sum(np.exp(np.dot(Y_possibility, np.dot(Theta, XV.T))), 0);
+            LogVraisemblance = np.sum(np.dot(YV, Theta) * XV, 1) - np.log(Z)
+            LogVraisemblance = np.sum(LogVraisemblance)
+            regularization_minibatch_log_vraisemblance_output.append(LogVraisemblance)
+            
+            Z = np.sum(np.exp(np.dot(Y_possibility, np.dot(Theta, XB.T))), 0);
+            Z = np.c_[Z, Z, Z, Z]
+
+            Gauche = np.dot(YB.T, XB)
+            Droite = np.dot((np.exp(np.dot(Y_possibility, np.dot(Theta, XB.T))).T / Z).T, XB)
+
+            Gradient = (Gauche - Droite) / NumberOfBatches + batchSize /learningSize * (lambda2 * 2 * Theta + lambda1 * ((Theta > 0) + (Theta < 0) * -1))
+            DeltaTheta = Alpha * DeltaTheta + learning_rate * Gradient
+            Theta = Theta + DeltaTheta
+
+            regularization_minibatch_precisionA_output.append(precision(XA, YA, Theta, n))
+            regularization_minibatch_precisionV_output.append(precision(XV, YV, Theta, n))
+
+            if len(regularization_minibatch_log_vraisemblance_output) > 1:
+                converged = (regularization_minibatch_log_vraisemblance_output[-1] - regularization_minibatch_log_vraisemblance_output[-2]) < 0.5
+
+    plt.plot(regularization_minibatch_log_vraisemblance_output)
+    plt.title("Log vraisemblance de la méthode de mini-batch avec régularisation")
+    plt.ylabel("Log vraisemblance")
+    plt.xlabel("Iteration")
+    plt.show()
+
+    plt.plot(regularization_minibatch_precisionA_output, label="Validation")
+    plt.plot(regularization_minibatch_precisionV_output, label="Apprentissage")
+    plt.title("Graphique de la précision sur les ensembles d'apprentissage et de validation")
+    plt.ylabel("Précision")
+    plt.xlabel("Itération")
+    plt.legend(loc="lower right")
+    plt.show()
+
+    print("All converged")
+
 
 def precision(X, Y, Theta, n):
     Z = np.sum(np.exp(np.dot(np.identity(n), np.dot(Theta, X.T))), 0);
