@@ -243,6 +243,7 @@ class Board(pyglet.event.EventDispatcher):
             self.dispatch_event('on_lines', lines_found)
 
     def move_piece(self, motion_state):
+        print self.get_features()
         if motion_state == key.MOTION_LEFT:
             self.move_left()
         elif motion_state == key.MOTION_RIGHT:
@@ -268,6 +269,43 @@ class Board(pyglet.event.EventDispatcher):
     def draw_block(self, x, y):
         y += 1 # since calculated_height does not account for 0-based index
         self.block.blit(x * BLOCK_WIDTH, self.calculated_height - y * BLOCK_HEIGHT)
+
+    def get_features(self):
+        features= []
+        totalColumnMaxHeight = self.height
+        #ColumnHeight
+        for x in range(self.width):
+            columnMaxHeight = self.height
+            for y in range(self.height - 1, 0, -1):
+                if self.board[y][x] == BLOCK_FULL:
+                    columnMaxHeight = y
+            if(columnMaxHeight < totalColumnMaxHeight):
+                totalColumnMaxHeight = columnMaxHeight
+            features.append(self.height - columnMaxHeight)
+
+        #Column difference
+        for i in range(self.width - 1):
+            features.append(abs(features[i + 1] - features[i]))
+        #Max height
+        features.append(self.height - totalColumnMaxHeight)
+        #Number of holes
+        numberOfHoles = 0
+        for x in range(self.width):
+            cellFilledAbove = False
+            for y in range(self.height):
+                if cellFilledAbove and self.board[y][x] == BLOCK_EMPTY:
+                    numberOfHoles += 1
+                if self.board[y][x] == BLOCK_FULL:
+                    cellFilledAbove = True
+        features.append(numberOfHoles)
+        #Previous reward
+        features.append(0)
+        return features
+
+
+
+
+
 
 
 Board.register_event_type('on_lines')
