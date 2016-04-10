@@ -232,6 +232,11 @@ def main():
     plt.legend(loc="lower right")
     plt.show()
 
+    plt.hist(Theta.reshape((4*201, 1)))
+    plt.title("Histogramme de Theta")
+    plt.ylabel("Valeur")
+    plt.show()
+
     print("All converged")
 
 
