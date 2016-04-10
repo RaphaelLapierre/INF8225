@@ -28,4 +28,7 @@ class tetrisAI(object):
         self.deltas = self.deltas / 2
 
     def choose_action(self):
-        features, actions = tetris.board.get_features()
+        features_list, actions_list = tetris.board.get_features()
+        features = numpy.array(features_list)
+        
+        quality_function = self.deltas.T * features
