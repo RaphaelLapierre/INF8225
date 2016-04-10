@@ -1,6 +1,6 @@
 import pyglet
 from pyglet.window import key
-
+import copy
 import random
 import sys
 
@@ -25,6 +25,14 @@ BLOCK_HEIGHT = block.height
 
 window = pyglet.window.Window(width=BOARD_WIDTH*BLOCK_WIDTH,
                               height=BOARD_HEIGHT*BLOCK_HEIGHT)
+
+HEIGHT_START_INDEX = 0
+HEIGHT_LENGTH = BOARD_WIDTH
+DIFFERENCE_START_INDEX = BOARD_WIDTH
+DIFFERENCE_LENGTH = BOARD_WIDTH - 1
+MAX_HEIGHT_INDEX = BOARD_WIDTH * 2 - 1
+HOLES_INDEX = BOARD_WIDTH * 2
+REWARD_INDEX = BOARD_WIDTH * 2 + 1
 
 class Shape(object):
     _shapes = [
@@ -203,7 +211,7 @@ class Board(pyglet.event.EventDispatcher):
         shape = shape or self.active_shape
         for y in range(4):
             for x in range(4):
-                if y + shape.y < 0:
+                if y + shape.y < 0 or y + shape.y >= self.height:
                     continue
                 if shape.shape[y][x] and self.board[y + shape.y][x + shape.x]:
                     return True
@@ -270,14 +278,14 @@ class Board(pyglet.event.EventDispatcher):
         y += 1 # since calculated_height does not account for 0-based index
         self.block.blit(x * BLOCK_WIDTH, self.calculated_height - y * BLOCK_HEIGHT)
 
-    def get_features(self):
+    def get_features_of_board(self, board):
         features= []
         totalColumnMaxHeight = self.height
         #ColumnHeight
         for x in range(self.width):
             columnMaxHeight = self.height
             for y in range(self.height - 1, 0, -1):
-                if self.board[y][x] == BLOCK_FULL:
+                if board[y][x] == BLOCK_FULL:
                     columnMaxHeight = y
             if(columnMaxHeight < totalColumnMaxHeight):
                 totalColumnMaxHeight = columnMaxHeight
@@ -293,24 +301,44 @@ class Board(pyglet.event.EventDispatcher):
         for x in range(self.width):
             cellFilledAbove = False
             for y in range(self.height):
-                if cellFilledAbove and self.board[y][x] == BLOCK_EMPTY:
+                if cellFilledAbove and board[y][x] == BLOCK_EMPTY:
                     numberOfHoles += 1
-                if self.board[y][x] == BLOCK_FULL:
+                if board[y][x] == BLOCK_FULL:
                     cellFilledAbove = True
         features.append(numberOfHoles)
         #Previous reward
         features.append(0)
         return features
 
+    def get_features(self):
 
+        features = []
+        shape = self.active_shape.clone()
 
-
-
-
+        for i in range(4):
+            shape.x = -2
+            shape.y = 0
+            while(self.out_of_bounds(shape)):
+                shape.x += 1
+            while(not self.out_of_bounds(shape)):
+                shape.y = 0
+                while( not self.check_bottom(shape) and  not self.is_collision(shape)):
+                    shape.y += 1
+                shape.y -= 1
+                board = copy.deepcopy(self.board)
+                for y in range(4):
+                    for x in range(4):
+                        dx = x + shape.x
+                        dy = y + shape.y
+                        if shape.shape[y][x] == BLOCK_FULL:
+                            board[dy][dx] = BLOCK_FULL
+                features.append(self.get_features_of_board(board))
+                shape.x += 1
+            shape.rotate()
+        return features
 
 Board.register_event_type('on_lines')
 Board.register_event_type('on_game_over')
-
 
 class Game(object):
     ticks = 0
