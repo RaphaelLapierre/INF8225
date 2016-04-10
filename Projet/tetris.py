@@ -310,10 +310,8 @@ class Board(pyglet.event.EventDispatcher):
         return features
 
     def get_features(self):
-
         features = []
         shape = self.active_shape.clone()
-
         for i in range(4):
             shape.x = -2
             shape.y = 0
@@ -331,7 +329,7 @@ class Board(pyglet.event.EventDispatcher):
                         dy = y + shape.y
                         if shape.shape[y][x] == BLOCK_FULL:
                             board[dy][dx] = BLOCK_FULL
-                features.append(self.get_features_of_board(board))
+                features.append((self.get_features_of_board(board), [shape.x, shape.y, i]))
                 shape.x += 1
             shape.rotate()
         return features
