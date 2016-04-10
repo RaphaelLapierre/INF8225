@@ -251,7 +251,6 @@ class Board(pyglet.event.EventDispatcher):
             self.dispatch_event('on_lines', lines_found)
 
     def move_piece(self, motion_state):
-        print self.get_features()
         if motion_state == key.MOTION_LEFT:
             self.move_left()
         elif motion_state == key.MOTION_RIGHT:
