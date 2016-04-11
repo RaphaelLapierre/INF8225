@@ -281,7 +281,6 @@ class Board(pyglet.event.EventDispatcher):
     def get_features_of_board(self, board):
         features= []
         totalColumnMaxHeight = self.height
-        #reward
         numberOfCompletedLines = 0
         for y in range(self.height):
             fullLine = True
@@ -289,6 +288,7 @@ class Board(pyglet.event.EventDispatcher):
                 fullLine = fullLine and board[y][x] == BLOCK_FULL
             if fullLine:
                 numberOfCompletedLines += 1
+
         #ColumnHeight
         for x in range(self.width):
             columnMaxHeight = self.height
@@ -302,8 +302,10 @@ class Board(pyglet.event.EventDispatcher):
         #Column difference
         for i in range(self.width - 1):
             features.append(float(abs(features[i + 1] - features[i])))
+
         #Max height
         features.append(float(self.height - totalColumnMaxHeight - numberOfCompletedLines))
+
         #Number of holes
         numberOfHoles = 0
         for x in range(self.width):
@@ -311,14 +313,11 @@ class Board(pyglet.event.EventDispatcher):
             for y in range(self.height):
                 if cellFilledAbove and board[y][x] == BLOCK_EMPTY:
                     numberOfHoles += 1
-                    break
+                    #break
                 if board[y][x] == BLOCK_FULL:
                     cellFilledAbove = True
         features.append(float(numberOfHoles))
-
-
-
-        reward = -(self.height -totalColumnMaxHeight - numberOfCompletedLines) * 1 + -1 *numberOfHoles + numberOfCompletedLines * 10
+        reward = -(self.height -totalColumnMaxHeight - numberOfCompletedLines) + -1 *numberOfHoles + numberOfCompletedLines * 50
         features.append(float(reward))
         return features
 
@@ -355,9 +354,11 @@ Board.register_event_type('on_game_over')
 class Game(object):
     ticks = 0
     factor = 4
-    frame_rate = 60.0
+    frame_rate = 1000.0
     is_paused = False
     numberOfGames = 0
+    average_lines = 0
+    total_lines = 0
 
     def __init__(self, window_ref, board, starting_level=1):
         self.window_ref = window_ref
@@ -403,6 +404,8 @@ class Game(object):
     def on_game_over(self):
         self.ai.update_thetas()
         self.numberOfGames += 1
+        self.total_lines += self.lines
+        self.average_lines = self.total_lines / self.numberOfGames
         print (str(self.numberOfGames) + ", " + str(self.lines))
         self.reset()
     
@@ -416,7 +419,7 @@ class Game(object):
         self.is_paused = not self.is_paused
     
     def update_caption(self):
-        self.window_ref.set_caption('Tetris - %s lines [%s]' % (self.lines, self.score))
+        self.window_ref.set_caption('Tetris - %s lines [%s]' % (self.average_lines, self.score))
 
 
 board = Board(BOARD_WIDTH, BOARD_HEIGHT, block)

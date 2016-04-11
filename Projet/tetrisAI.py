@@ -8,9 +8,6 @@ class TetrisAI:
         self.zs = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1)) 
         self.deltas = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1))
         self.beta = 0.5
-        self.G = numpy.zeros((2 * tetris.BOARD_WIDTH +2, 2 * tetris.BOARD_WIDTH +2))
-        for i in range(2 * tetris.BOARD_WIDTH + 2):
-            self.G[i][i] = 0.0001
         self.alpha = 0.001
         self.t = 0
 
@@ -24,8 +21,7 @@ class TetrisAI:
         features_esperance = numpy.sum(features, axis=1) / features.shape[0]
         score_ratio =  chosen_features - features_esperance
 
-        self.zs = self.beta * self.zs + score_ratio.reshape(22,1)
-        self.G = self.G + float(self.t) / (self.t + 1) * (numpy.dot(self.zs, self.zs.T) - self.G)
+        self.zs = self.beta * self.zs + score_ratio.reshape(tetris.BOARD_WIDTH * 2 + 2,1)
         self.deltas = self.deltas + float(self.t) / (self.t + 1) * (chosen_features[tetris.REWARD_INDEX] * self.zs - self.deltas)
         self.t += 1
 
@@ -34,8 +30,12 @@ class TetrisAI:
         self.reset_deltas()
 
     def reset_deltas(self):
-        self.deltas = self.deltas / 2
-        self.t = self.t / 2
+        import tetris
+        #self.deltas = self.deltas / 2
+        self.deltas = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1))
+        #self.t = self.t / 2
+        self.t = 0
+        self.zs = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1))
 
     def choose_action(self):
         import tetris
@@ -50,6 +50,7 @@ class TetrisAI:
         action_index = numpy.argmax(Q)
         x, y, rotation = actions[action_index]
         deltaX = x - tetris.board.active_shape.x
+        deltaY = y - tetris.board.active_shape.y
         for i in range(rotation):
             tetris.board.active_shape.rotate()
         if(deltaX > 0):
@@ -58,7 +59,7 @@ class TetrisAI:
         else:
             for i in range(abs(deltaX)):
                 tetris.board.move_left()
-        for i in range(y):
+        for i in range(deltaY):
             tetris.board.move_down()
 
         self.update_deltas(matrix_features.T, action_index)
