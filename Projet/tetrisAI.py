@@ -8,7 +8,7 @@ class TetrisAI:
         self.zs = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1)) 
         self.deltas = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1))
         self.beta = 0.5
-        self.alpha = 0.01
+        self.alpha = 0.001
         self.t = 0
 
     def apply_policy(self):
@@ -24,11 +24,11 @@ class TetrisAI:
         self.t += 1
 
     def update_thetas(self):
-        self.thetas = self.thetas + self.alpha * self.deltas
+        self.thetas = self.thetas - self.alpha * self.deltas
         self.reset_deltas()
 
     def reset_deltas(self):
-        self.deltas = self.deltas / 2
+        self.deltas = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1))
 
     def choose_action(self):
         features_actions = tetris.board.get_features()
@@ -54,8 +54,5 @@ class TetrisAI:
                 tetris.board.move_left()
         for i in range(y):
             tetris.board.move_down()
-
-        #tetris.board.active_shape.x = x
-        #tetris.board.active_shape.y = y
 
         self.update_deltas(matrix_features.T, action_index)

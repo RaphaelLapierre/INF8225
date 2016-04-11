@@ -315,7 +315,7 @@ class Board(pyglet.event.EventDispatcher):
             if fullLine:
                 numberOfCompletedLines += 1
 
-        reward = -10 * numberOfHoles - 5 * totalColumnMaxHeight + 1000 * numberOfCompletedLines
+        reward = -numberOfHoles  + 1000 * numberOfCompletedLines
         features.append(float(reward))
         return features
 
@@ -352,7 +352,7 @@ Board.register_event_type('on_game_over')
 class Game(object):
     ticks = 0
     factor = 4
-    frame_rate = 60.0
+    frame_rate = 100000.0
     is_paused = False
     numberOfGames = 0
 
