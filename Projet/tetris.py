@@ -3,7 +3,6 @@ from pyglet.window import key
 import copy
 import random
 import sys
-import tetrisAI
 
 __module_name__ = 'tetris'
 __module_description__ = 'a clone of tetris written in python'
@@ -365,6 +364,7 @@ class Game(object):
         self.board = board
         self.starting_level = int(starting_level)
         self.register_callbacks()
+        import tetrisAI
         self.ai = tetrisAI.TetrisAI()
         self.reset()
     
