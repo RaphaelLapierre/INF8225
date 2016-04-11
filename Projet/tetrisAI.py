@@ -1,9 +1,9 @@
 import numpy
-import tetris
 
 
 class TetrisAI:
     def __init__(self):
+        import tetris
         self.thetas = numpy.ones((2 * tetris.BOARD_WIDTH + 2, 1)) 
         self.zs = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1)) 
         self.deltas = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1))
@@ -15,9 +15,11 @@ class TetrisAI:
         self.t = 0
 
     def apply_policy(self):
+        import tetris
         features = tetris.board.get_features()
 
     def update_deltas(self, features, chosen_features_index):
+        import tetris
         chosen_features = features[:,chosen_features_index]
         features_esperance = numpy.sum(features, axis=1) / features.shape[0]
         score_ratio =  chosen_features - features_esperance
@@ -36,6 +38,7 @@ class TetrisAI:
         self.t = self.t / 2
 
     def choose_action(self):
+        import tetris
         features_actions = tetris.board.get_features()
         features = []
         actions = []
