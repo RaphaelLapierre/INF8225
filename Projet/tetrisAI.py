@@ -8,7 +8,7 @@ class TetrisAI:
         self.zs = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1)) 
         self.deltas = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1))
         self.beta = 0.5
-        self.alpha = 0.1
+        self.alpha = 0.000000001
         self.t = 0
 
     def apply_policy(self):
