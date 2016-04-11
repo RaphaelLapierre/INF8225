@@ -242,7 +242,8 @@ class Board(pyglet.event.EventDispatcher):
                 dx = x + self.active_shape.x
                 dy = y + self.active_shape.y
                 if self.active_shape.shape[y][x] == BLOCK_FULL:
-                    self.board[dy][dx] = BLOCK_FULL
+                    if dy < self.height and dx < self.width:
+                        self.board[dy][dx] = BLOCK_FULL
         
         lines_found = 0
         while self.test_for_line():
@@ -281,31 +282,6 @@ class Board(pyglet.event.EventDispatcher):
     def get_features_of_board(self, board):
         features= []
         totalColumnMaxHeight = self.height
-        #ColumnHeight
-        for x in range(self.width):
-            columnMaxHeight = self.height
-            for y in range(self.height - 1, 0, -1):
-                if board[y][x] == BLOCK_FULL:
-                    columnMaxHeight = y
-            if(columnMaxHeight < totalColumnMaxHeight):
-                totalColumnMaxHeight = columnMaxHeight
-            features.append(float(self.height - columnMaxHeight))
-
-        #Column difference
-        for i in range(self.width - 1):
-            features.append(float(abs(features[i + 1] - features[i])))
-        #Max height
-        features.append(float(self.height - totalColumnMaxHeight))
-        #Number of holes
-        numberOfHoles = 0
-        for x in range(self.width):
-            cellFilledAbove = False
-            for y in range(self.height):
-                if cellFilledAbove and board[y][x] == BLOCK_EMPTY:
-                    numberOfHoles += 1
-                if board[y][x] == BLOCK_FULL:
-                    cellFilledAbove = True
-        features.append(float(numberOfHoles))
         #reward
         numberOfCompletedLines = 0
         for y in range(self.height):
@@ -314,8 +290,36 @@ class Board(pyglet.event.EventDispatcher):
                 fullLine = fullLine and board[y][x] == BLOCK_FULL
             if fullLine:
                 numberOfCompletedLines += 1
+        #ColumnHeight
+        for x in range(self.width):
+            columnMaxHeight = self.height
+            for y in range(self.height - 1, 0, -1):
+                if board[y][x] == BLOCK_FULL:
+                    columnMaxHeight = y
+            if(columnMaxHeight < totalColumnMaxHeight):
+                totalColumnMaxHeight = columnMaxHeight
+            features.append(float(self.height - columnMaxHeight - numberOfCompletedLines))
 
-        reward = -1 *numberOfHoles - float(totalColumnMaxHeight/5) + 10 * numberOfCompletedLines
+        #Column difference
+        for i in range(self.width - 1):
+            features.append(float(abs(features[i + 1] - features[i])))
+        #Max height
+        features.append(float(self.height - totalColumnMaxHeight - numberOfCompletedLines))
+        #Number of holes
+        numberOfHoles = 0
+        for x in range(self.width):
+            cellFilledAbove = False
+            for y in range(self.height):
+                if cellFilledAbove and board[y][x] == BLOCK_EMPTY:
+                    numberOfHoles += 1
+                    break
+                if board[y][x] == BLOCK_FULL:
+                    cellFilledAbove = True
+        features.append(float(numberOfHoles))
+
+
+
+        reward = -(self.height -totalColumnMaxHeight - numberOfCompletedLines) * 1 + -1 *numberOfHoles + numberOfCompletedLines * 10
         features.append(float(reward))
         return features
 
@@ -323,7 +327,7 @@ class Board(pyglet.event.EventDispatcher):
         features = []
         shape = self.active_shape.clone()
         for i in range(4):
-            shape.x = -2
+            shape.x = -4
             shape.y = 0
             while(self.out_of_bounds(shape)):
                 shape.x += 1
@@ -352,7 +356,7 @@ Board.register_event_type('on_game_over')
 class Game(object):
     ticks = 0
     factor = 4
-    frame_rate = 100000.0
+    frame_rate = 60.0
     is_paused = False
     numberOfGames = 0
 
@@ -399,7 +403,7 @@ class Game(object):
     def on_game_over(self):
         self.ai.update_thetas()
         self.numberOfGames += 1
-        print self.numberOfGames
+        print (str(self.numberOfGames) + ", " + str(self.lines))
         self.reset()
     
     def cycle(self):
