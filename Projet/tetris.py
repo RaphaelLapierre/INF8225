@@ -3,6 +3,7 @@ from pyglet.window import key
 import copy
 import random
 import sys
+import tetrisAI
 
 __module_name__ = 'tetris'
 __module_description__ = 'a clone of tetris written in python'
@@ -305,31 +306,42 @@ class Board(pyglet.event.EventDispatcher):
                 if board[y][x] == BLOCK_FULL:
                     cellFilledAbove = True
         features.append(numberOfHoles)
-        #Previous reward
-        features.append(0)
+        #reward
+        numberOfCompletedLines = 0
+        for y in range(self.height):
+            fullLine = True
+            for x in range(self.width):
+                fullLine = fullLine and board[y][x] == BLOCK_FULL
+            if fullLine:
+                numberOfCompletedLines += 1
+
+        reward = -1 * numberOfHoles - 1 * totalColumnMaxHeight + 10 * numberOfCompletedLines
+        features.append(reward)
         return features
 
     def get_features(self):
         features = []
         shape = self.active_shape.clone()
         for i in range(4):
-            shape.x = -2
+            shape.x = 0
             shape.y = 0
             while(self.out_of_bounds(shape)):
                 shape.x += 1
+
             while(not self.out_of_bounds(shape)):
                 shape.y = 0
                 while( not self.check_bottom(shape) and  not self.is_collision(shape)):
                     shape.y += 1
                 shape.y -= 1
-                board = copy.deepcopy(self.board)
-                for y in range(4):
-                    for x in range(4):
-                        dx = x + shape.x
-                        dy = y + shape.y
-                        if shape.shape[y][x] == BLOCK_FULL:
-                            board[dy][dx] = BLOCK_FULL
-                features.append((self.get_features_of_board(board), [shape.x, shape.y, i]))
+                if(~self.is_collision(shape)):
+                    board = copy.deepcopy(self.board)
+                    for y in range(4):
+                        for x in range(4):
+                            dx = x + shape.x
+                            dy = y + shape.y
+                            if shape.shape[y][x] == BLOCK_FULL:
+                                board[dy][dx] = BLOCK_FULL
+                    features.append((self.get_features_of_board(board), [shape.x, shape.y, i]))
                 shape.x += 1
             shape.rotate()
         return features
@@ -341,7 +353,6 @@ class Game(object):
     ticks = 0
     factor = 4
     frame_rate = 60.0
-    
     is_paused = False
     
     def __init__(self, window_ref, board, starting_level=1):
@@ -349,6 +360,7 @@ class Game(object):
         self.board = board
         self.starting_level = int(starting_level)
         self.register_callbacks()
+        self.ai = tetrisAI.TetrisAI()
         self.reset()
     
     def register_callbacks(self):
@@ -358,6 +370,7 @@ class Game(object):
         self.level = self.starting_level
         self.lines = 0
         self.score = 0
+
     
     def should_update(self):
         if self.is_paused:
@@ -383,12 +396,14 @@ class Game(object):
             self.level = self.lines / 10
     
     def on_game_over(self):
+        self.ai.update_thetas()
         self.reset()
     
     def cycle(self):
-        if self.should_update():
-            self.board.move_down()
-            self.update_caption()
+        #if self.should_update():
+         self.ai.choose_action()
+         self.board.move_down()
+         self.update_caption()
     
     def toggle_pause(self):
         self.is_paused = not self.is_paused
