@@ -289,13 +289,13 @@ class Board(pyglet.event.EventDispatcher):
                     columnMaxHeight = y
             if(columnMaxHeight < totalColumnMaxHeight):
                 totalColumnMaxHeight = columnMaxHeight
-            features.append(self.height - columnMaxHeight)
+            features.append(float(self.height - columnMaxHeight))
 
         #Column difference
         for i in range(self.width - 1):
-            features.append(abs(features[i + 1] - features[i]))
+            features.append(float(abs(features[i + 1] - features[i])))
         #Max height
-        features.append(self.height - totalColumnMaxHeight)
+        features.append(float(self.height - totalColumnMaxHeight))
         #Number of holes
         numberOfHoles = 0
         for x in range(self.width):
@@ -305,7 +305,7 @@ class Board(pyglet.event.EventDispatcher):
                     numberOfHoles += 1
                 if board[y][x] == BLOCK_FULL:
                     cellFilledAbove = True
-        features.append(numberOfHoles)
+        features.append(float(numberOfHoles))
         #reward
         numberOfCompletedLines = 0
         for y in range(self.height):
@@ -315,8 +315,8 @@ class Board(pyglet.event.EventDispatcher):
             if fullLine:
                 numberOfCompletedLines += 1
 
-        reward = -1 * numberOfHoles - 1 * totalColumnMaxHeight + 10 * numberOfCompletedLines
-        features.append(reward)
+        reward = -10 * numberOfHoles - 5 * totalColumnMaxHeight + 1000 * numberOfCompletedLines
+        features.append(float(reward))
         return features
 
     def get_features(self):
@@ -354,7 +354,8 @@ class Game(object):
     factor = 4
     frame_rate = 60.0
     is_paused = False
-    
+    numberOfGames = 0
+
     def __init__(self, window_ref, board, starting_level=1):
         self.window_ref = window_ref
         self.board = board
@@ -397,6 +398,8 @@ class Game(object):
     
     def on_game_over(self):
         self.ai.update_thetas()
+        self.numberOfGames += 1
+        print self.numberOfGames
         self.reset()
     
     def cycle(self):

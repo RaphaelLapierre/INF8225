@@ -8,7 +8,7 @@ class TetrisAI:
         self.zs = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1)) 
         self.deltas = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1))
         self.beta = 0.5
-        self.alpha = 0.000000001
+        self.alpha = 0.01
         self.t = 0
 
     def apply_policy(self):
@@ -19,7 +19,7 @@ class TetrisAI:
         features_esperance = numpy.sum(features, axis=1)
         score_ratio =  chosen_features - features_esperance
 
-        self.zs = self.beta * self.zs + score_ratio
+        self.zs = self.beta * self.zs + score_ratio.reshape(22,1)
         self.deltas = self.deltas + float(self.t) / (self.t + 1) * (chosen_features[tetris.REWARD_INDEX] * self.zs - self.deltas)
         self.t += 1
 
