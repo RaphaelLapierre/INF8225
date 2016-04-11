@@ -315,7 +315,7 @@ class Board(pyglet.event.EventDispatcher):
             if fullLine:
                 numberOfCompletedLines += 1
 
-        reward = -numberOfHoles  + 1000 * numberOfCompletedLines
+        reward = -1 *numberOfHoles - float(totalColumnMaxHeight/5) + 10 * numberOfCompletedLines
         features.append(float(reward))
         return features
 
@@ -323,7 +323,7 @@ class Board(pyglet.event.EventDispatcher):
         features = []
         shape = self.active_shape.clone()
         for i in range(4):
-            shape.x = 0
+            shape.x = -2
             shape.y = 0
             while(self.out_of_bounds(shape)):
                 shape.x += 1
