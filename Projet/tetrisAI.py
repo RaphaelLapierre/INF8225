@@ -8,7 +8,7 @@ class TetrisAI:
         self.zs = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1)) 
         self.deltas = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1))
         self.beta = 0.5
-        self.alpha = 0.001
+        self.alpha = 0.00001
         self.t = 0
 
     def apply_policy(self):
@@ -39,7 +39,7 @@ class TetrisAI:
 
     def choose_action(self):
         import tetris
-        features_actions = tetris.board.get_features()
+        features_actions = tetris.board.get_features_2_next_moves()
         features = []
         actions = []
         for i in range(len(features_actions)):

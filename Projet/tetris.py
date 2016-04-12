@@ -207,13 +207,14 @@ class Board(pyglet.event.EventDispatcher):
             return True
         return False
     
-    def is_collision(self, shape=None):
+    def is_collision(self, shape=None, board = None):
         shape = shape or self.active_shape
+        board = board or self.board
         for y in range(4):
             for x in range(4):
                 if y + shape.y < 0 or y + shape.y >= self.height:
                     continue
-                if shape.shape[y][x] and self.board[y + shape.y][x + shape.x]:
+                if shape.shape[y][x] and board[y + shape.y][x + shape.x]:
                     return True
         return False
     
@@ -317,7 +318,7 @@ class Board(pyglet.event.EventDispatcher):
                 if board[y][x] == BLOCK_FULL:
                     cellFilledAbove = True
         features.append(float(numberOfHoles))
-        reward = -(self.height -totalColumnMaxHeight - numberOfCompletedLines) + -1 *numberOfHoles + numberOfCompletedLines * 50
+        reward = -(self.height -totalColumnMaxHeight - numberOfCompletedLines) + -1 *numberOfHoles + numberOfCompletedLines * 10
         features.append(float(reward))
         return features
 
@@ -344,6 +345,68 @@ class Board(pyglet.event.EventDispatcher):
                             if shape.shape[y][x] == BLOCK_FULL:
                                 board[dy][dx] = BLOCK_FULL
                     features.append((self.get_features_of_board(board), [shape.x, shape.y, i]))
+                shape.x += 1
+            shape.rotate()
+        return features
+
+
+    def get_features_2_next_moves(self):
+        features = []
+        shape = self.active_shape.clone()
+        board = copy.deepcopy(self.board)
+        for i in range(4):
+            shape.x = -4
+            shape.y = 0
+            while (self.out_of_bounds(shape)):
+                shape.x += 1
+
+            while (not self.out_of_bounds(shape)):
+                shape.y = 0
+                while (not self.check_bottom(shape) and not self.is_collision(shape)):
+                    shape.y += 1
+                shape.y -= 1
+                if (~self.is_collision(shape)):
+                    for y in range(4):
+                        for x in range(4):
+                            dx = x + shape.x
+                            dy = y + shape.y
+                            if shape.shape[y][x] == BLOCK_FULL:
+                                board[dy][dx] = BLOCK_FULL
+
+                    next_shape = self.pending_shape.clone()
+                    for j in range(4):
+                        next_shape.x = -4
+                        next_shape.y = 0
+                        while self.out_of_bounds(next_shape):
+                            next_shape.x += 1
+
+                        while not self.out_of_bounds(next_shape):
+                            next_shape.y = 0
+                            while not self.check_bottom(next_shape) and not self.is_collision(next_shape, board):
+                                next_shape.y += 1
+                            next_shape.y -= 1
+                            if (~self.is_collision(next_shape, board)):
+                                for y in range(4):
+                                    for x in range(4):
+                                        dx = x + next_shape.x
+                                        dy = y + next_shape.y
+                                        if next_shape.shape[y][x] == BLOCK_FULL:
+                                            board[dy][dx] = BLOCK_FULL
+                                features.append((self.get_features_of_board(board), [shape.x, shape.y, i]))
+                                for y in range(4):
+                                    for x in range(4):
+                                        dx = x + next_shape.x
+                                        dy = y + next_shape.y
+                                        if next_shape.shape[y][x] == BLOCK_FULL:
+                                            board[dy][dx] = BLOCK_EMPTY
+                            next_shape.x += 1
+                        next_shape.rotate()
+                for y in range(4):
+                    for x in range(4):
+                        dx = x + shape.x
+                        dy = y + shape.y
+                        if shape.shape[y][x] == BLOCK_FULL:
+                            board[dy][dx] = BLOCK_EMPTY
                 shape.x += 1
             shape.rotate()
         return features
@@ -419,7 +482,7 @@ class Game(object):
         self.is_paused = not self.is_paused
     
     def update_caption(self):
-        self.window_ref.set_caption('Tetris - %s lines [%s]' % (self.average_lines, self.score))
+        self.window_ref.set_caption('Tetris - %s lines [%s]' % (self.average_lines, self.lines))
 
 
 board = Board(BOARD_WIDTH, BOARD_HEIGHT, block)
