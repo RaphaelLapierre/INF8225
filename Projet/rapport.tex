@@ -1,0 +1,300 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Thin Sectioned Essay
+% LaTeX Template
+% Version 1.0 (3/8/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original Author:
+% Nicolas Diaz (nsdiaz@uc.cl) with extensive modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[a4paper, 12pt]{article} % Font size (can be 10pt, 11pt or 12pt) and paper size (remove a4paper for US letter paper)
+
+\usepackage[protrusion=true,expansion=true]{microtype} % Better typography
+\usepackage{graphicx} % Required for including pictures
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{url}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{setspace}
+\usepackage{enumitem}
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\usepackage[T1]{fontenc} % Required for accented characters
+\usepackage{times} % Use the Palatino font
+
+\usepackage{listings}
+\usepackage{color}
+\lstset{mathescape}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+   language=c++,
+   aboveskip=3mm,
+   belowskip=3mm,
+   showstringspaces=false,
+   columns=flexible,
+   basicstyle={\small\ttfamily},
+   numbers=none,
+   numberstyle=\tiny\color{gray},
+   keywordstyle=\color{blue},
+   commentstyle=\color{dkgreen},
+   stringstyle=\color{mauve},
+   breaklines=true,
+   breakatwhitespace=true
+   tabsize=3
+}
+\linespread{1.25} % Change line spacing here, Palatino benefits from a slight increase by default
+
+\makeatletter
+\renewcommand{\@listI}{\itemsep=0pt} % Reduce the space between items in the itemize and enumerate environments and the bibliography
+
+\renewcommand\abstractname{Résumé}
+\renewcommand\refname{Références}
+\renewcommand\contentsname{Table des matières}
+\renewcommand{\maketitle}{ % Customize the title - do not edit title and author name here, see the TITLE block below
+\begin{center} % Right align
+
+\vspace*{25pt} % Some vertical space between the title and author name
+{\LARGE\@title} % Increase the font size of the title
+
+\vspace{125pt} % Some vertical space between the title and author name
+
+{\large\@author} % Author name
+
+\vspace{125pt} % Some vertical space between the author block and abstract
+Dans le cadre du cours
+\\INF8702 - Infographie avancée
+\vspace{125pt} % Some vertical space between the author block and abstract
+\\\@date % Date
+\vspace{125pt} % Some vertical space between the author block and abstract
+
+\end{center}
+}
+
+%----------------------------------------------------------------------------------------
+%	TITLE
+%----------------------------------------------------------------------------------------
+
+\title{Projet: Q-learning appliqué au jeu de Tetris} 
+
+\author{\textsc{Guillaume Arruda 1635805\\Raphael Lapierre 1644671} % Author
+\vspace{10pt}
+\\{\textit{École polytechnique de Montréal}}} % Institution
+
+\date{21 Avril 2016} % Date
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\thispagestyle{empty}
+\clearpage\maketitle % Print the title section
+\pagebreak[4]
+\tableofcontents
+\pagebreak[4]
+%----------------------------------------------------------------------------------------
+%	En tête et pieds de page 
+%----------------------------------------------------------------------------------------
+
+\setlength{\headheight}{15.0pt}
+\pagestyle{fancy}
+\fancyhead[L]{INF8225}
+\fancyhead[C]{}
+\fancyhead[R]{Rapport final}
+\fancyfoot[C]{\textbf{page \thepage}}
+
+%----------------------------------------------------------------------------------------
+%	ESSAY BODY
+%----------------------------------------------------------------------------------------
+\section{Introduction}
+    \paragraph{}
+    Dans le cadre du cours de techniques d'intelligence artificielle probabilistiques,
+    nous avons décidé d'implémenter un agent intelligent pouvant jouer à Tetris et ce,
+    en utilisant la technique de \textit{Q-learning}. Pour se faire, nous avons utilisé
+    une implémentation \textit{open source} de Tetris écrite en Python. L'agent intelligent
+    a aussi été réalisé dans ce langage de programmation. Le présent rapport décrira, dans les 
+    sections suivantes, qu'est-ce que le jeu de Tétris, une revue de la littérature sur le sujet,
+    la théorie appliquée à notre agent intelligent, les résultats obtenues ainsi que nos expériences
+    et finalement une analyse critique de l'approche utilisée pour règler le problème.
+
+
+\section{Revue de littérature}
+    \paragraph{}
+    Avant de plonger dans la revue de littérature, voici une courte introduction sur la version
+    du jeu de Tetris utilisée pour ce travail
+
+    \subsection{Tetris}
+    	\paragraph{}
+	Le but du jeu de tetris est de remplir une grille de grandeur 10 par 22 à l'aide de pièces
+	arrivant aléatoirement sur la grille de jeu. Il y a sept sortes de pieces différentes toutes 
+	formées de 4 blocs. Chaque bloc occupe un espace de 1 par 1 sur la grille. De plus,
+	il est aussi possible de connaître, en plus de la pièce courante, la pièce suivante. Cela
+	permet de mieux planifier son jeu. Lorsqu'une ligne de largeur 10 est complétée, elle est enlevé
+	de l'espace de jeu. Le jeu est perdu lorsqu'une pièce atteint une hauteur plus grande que 22.
+
+    \subsection{Revue de littérature}
+    	\paragraph{}
+	Plusieurs travaux ont été réalisé dans le but d'écrire un agent intelligent pouvant jouer à Tetris
+	de manière efficace. Le premier article que nous avons consulté a été utile pour nous confimer que
+	Tetris est bel et bien un jeu complexe. En effet selon \cite{hard}, il est montré que le problème
+	de maximiser le nombre de ligne, le nombre de tetris (4 lignes en même temps), minimizer la hauteur
+	maximale de l'espace de jeu est un problème NP-complet.
+
+    	\paragraph{}
+	Par la suite, nous avons chercher des articles de recherches montrant qu'il est bel et bien possible
+	d'appliquer le \textit{Q-learning} au jeu de Tetris. Zucker et Maas \cite{tetris} ont montré que
+	la technique est applicable. Par contre, ils ont du utiliser une technique de \textit{features based Q-learning}
+	plutôt que de représenter l'état total du jeu. En effet, sur une grille de 10 par 22, il y a 220 cases qui peuvent
+	être soit occupé ou non. On se retrouve donc avec $2^{220}$ configurations possibles ce qui est définitivement
+	trop grand pour être représenté convenablement en mémoire.
+
+    	\paragraph{}
+	Finalement, \cite{toomuchstate} et \cite{noobs} ont confirmé que les résultats obtenus en tentant de représenter
+	complètement l'espace d'état sont très mauvais. Dans le cas de \cite{toomuchstate}, les auteurs ont dû eux aussi 
+	représenter le jeu par un ensemble d'attributs tandis que dans le cas de \cite{noobs}, l'expérience a été un échec
+	même en tentant de représenter le jeu par un ensemble d'attributs.
+	
+
+\section{Approche théorique}
+    \subsection{Processus de décision Markovien}
+        \paragraph{}
+        Il est important d'abord dans la section théorique de comprendre que l'algorithme de \textit{Q-learning} permet,
+        dans les bonnes conditions, d'obtenir la politique optimale permettant de résoudre un processus de décision Markovien.
+        La politique optimale d'un tel système permet de connaître l'action permettant de maximiser la victoire\cite{qlearning}.
+
+    \subsection{Algorithme de \textit{Q-learning} simple}
+    	\paragraph{}
+	La logique du \textit{Q-learning} de base est assez simple. Il s'agit d'apprendre quoi faire dans les situations
+	possibles en ajustant nos décisions futures basé sur une récompense obtenues par des décisions passées.
+	On doit d'abord initialiser un vecteur contenant des poids $Q(s, a)$ ou $s$ représente un état et $a$ une action.
+	En multipliant ces poids par notre vecteur d'état on trouve l'action qui maximise notre récompense et il s'agit 
+	de l'action choisi. L'ajustement des poids se fait ainsi :
+
+	\begin{equation}
+	    \Delta Q(S_{t}, A_{t}) = \alpha (R_{t+1} + \gamma max Q(S_{t+1}, a ) - Q(S_{t}, A_{t}))
+	\end{equation}
+
+	Où $R$ représente une fonction de récompense et $\alpha$ un taux d'apprentissage. Par contre, dans notre cas,
+	l'espace d'état étant trop grand on représente l'état $S$ par un sous-ensemble de caractéristique. L'algorithme
+	de \textit{Q-learning} ne change pas. Il est en effet invariant de la représentation de notre état. 
+
+    \subsection{\textit{Q-learning} appliqué à Tetris}
+    	\subsubsection{Caractéristiques}
+    	    \paragraph{}
+	    Dans le but de représenter notre jeu nous avons eu recours à un sous-ensemble de caractéristiques. Les voici :
+	    \begin{itemize}
+	    	\item La hauteur de chaques colonnes (10 caractéristiques)
+		\item La différence de hauteur entre les colonnes adjacentes (9 caractéristiques)
+		\item La hauteur totale
+		\item Le nombre de trous 
+		\item Une valeur de récompense
+	    \end{itemize}
+
+	    La valeur de récompense est donné dans notre cas par l'équation suivante :
+	    \begin{equation}
+	    \label{recompense}
+	    	R(l) = 2l - 1
+	    \end{equation}
+	    
+	    Dans cette équation $l$ représente le nombre de lignes complétés par une action.
+
+	\subsubsection{Modification de l'algorithem}
+    	    \paragraph{}
+	    Pour effectuer le travail nous nous sommes beaucoup inspiré de \cite{tetris}. Les équations utilisés sont les 
+	    suivantes. Les variations de nos poids $\theta$ sont calculées à l'aide de celles-ci
+
+	    \begin{equation}
+	        z_{t+1} = \beta z_{t} + \frac{\nabla q(\theta, x_{t+1}, u_{t+1})}{q(\theta, x_{t+1}, u_{t+1})}
+	    \end{equation}
+
+	    \begin{equation}
+	    	\Delta_{t+1} = \Delta_{t} + \frac{t}{t+1} (r(x_{t+1}, u_{t+1})z_{t+1} - \Delta_{t})
+	    \end{equation}
+
+	    \begin{equation}
+	        \theta \leftarrow  \theta + \alpha \Delta
+	    \end{equation}
+
+	    Finalement, à chaque fin de partie, à l'aide de la dernière équation, nos poids sont ajustés.
+
+	\subsubsection{Action}
+    	    \paragraph{}
+	    L'action choisie par notre agent intelligent pour jouer à Tetris est celle qui maximise la multiplication
+	    du vecteur de représentation d'état par nos poids $\theta$. Ainsi, pour chaque pièces à placer, toute les actions
+	    possibles sont envisagées et le vecteur d'état est remplie. Ceux-ci sont concaténés dans une matrice et le vecteur 
+	    de poids pré multiplie cette matrice. Aussi, deux pièces sont considérés à la fois. La matrice de vecteurs d'états
+	    est donc remplie de toutes les combinaisons possibles de ces actions.
+
+\section{Expérience}
+    \paragraph{}
+    Au cours de la réalisation de notre travail, plusieurs expérience ont été effectuées. Tout d'abord, le premier défi a été
+    de trouver une fonction de récompense efficace. Dans la littérature, plusieurs personnes suggéraient d'utiliser le nombre
+    de lignes complétées. Par contre, le problème avec une telle fonction est que la convergence est très longue. En effet,
+    il est rare pour un agent intelligent initialisé de manière aléatoire de réussir à compléter des lignes. C'est pourquoi
+    nous avons décidé de donner une récompense négative lorsqu'aucune lignes ne sont complétés\ref{recompense}.
+
+    \paragraph{}
+    L'autre expérience qui a augmenté de beaucoup l'efficacité de notre agent intelligent était de considérer deux pièces
+    à la fois plutôt qu'une. Cela a eu un effet immédiat sur les résultats obtenues. 
+
+    \paragraph{}
+    Une autre expérience très importante a été l'ajustement du paramètre $\beta$. Ce paramètre controle l'importance
+    des mouvements au fil de la partie. Plus le beta est près de 0, moins il garde une mémoire des mouvements ultérieurs.
+    Un $\beta$ de 1 accorde autant d'importances à tout les mouvements au cours de la partie. En faisant plusieurs
+    expérience nous avons réalisé qu'il est mieux d'utiliser un $\beta$ de valeur 1.
+
+    \subsection{Résultats}
+        \paragraph{}
+	Il est difficile de présenter une courbe d'apprentissage pour notre agent intelligent. En fait la courbe
+	n'est pas intéressante car il apprend extrêmement rapidement. Voici un tableau des résultats obtenues.
+
+	\begin{center}
+	\begin{tabular}[H]{|c|c|}
+	    \hline
+	    Essai & Nombre de lignes complétées \\
+	    \hline
+	    1     & 0 \\
+	    \hline
+	    2     & 412 \\
+	    \hline
+	    3     & 22062 \\
+	    \hline
+	\end{tabular}
+	\end{center}
+
+	Il devient à partir de se niveau très long de tester jusqu'où l'agent intelligent peut continuer. Par contre,
+	une chose intéressante est de le voir jouer au jeu. Ci-joint à ce rapport, un vidéo de l'agent intelligent qui
+	commence avec des poids complètement aléatoires. On peut voir que dès la deuxième partie il est beaucoup plus performant.
+	Le vidéo ne dure que 2 minutes dans le but de ne pas être trop long. Il est par contre clair que l'agent intelligent
+	pourrait continuer à jouer très longtemps.
+
+\section{Analyse critique}
+    \paragraph{}
+    L'approche utilisée pour apprendre le sujet choisi a été de d'abord comprendre la présentation de Rich Sutton \cite{qlearning}.
+    Par la suite, nous avons cherché des articles qui expliquaient bien la méthode du \textit{Q-learning} appliquée au jeu de Tetris.
+    Puisqu'il s'agit d'un sujet assez simple, il n'a pas été trop difficile de trouver l'information nécéssaire à la réalisation
+    de notre travail.
+
+
+\pagebreak[4]
+\bibliographystyle{plain}
+\bibliography{sample}
+
+%----------------------------------------------------------------------------------------
+\end{document}
