@@ -318,7 +318,7 @@ class Board(pyglet.event.EventDispatcher):
                 if board[y][x] == BLOCK_FULL:
                     cellFilledAbove = True
         features.append(float(numberOfHoles))
-        reward = -(self.height -totalColumnMaxHeight - numberOfCompletedLines) + -1 *numberOfHoles + numberOfCompletedLines * 10
+        reward = 2 * numberOfCompletedLines - 1
         features.append(float(reward))
         return features
 

@@ -7,7 +7,7 @@ class TetrisAI:
         self.thetas = numpy.ones((2 * tetris.BOARD_WIDTH + 2, 1)) 
         self.zs = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1)) 
         self.deltas = numpy.zeros((2 * tetris.BOARD_WIDTH + 2, 1))
-        self.beta = 0.5
+        self.beta = 1
         self.alpha = 0.00001
         self.t = 0
 
